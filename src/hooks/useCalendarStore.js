@@ -8,6 +8,7 @@ import {
 } from "../store/calendar/calendarSlice";
 import calendarApi from "../api/calendarApi";
 import { convertEventsToDateEvents } from "../helpers/convertEventsToDateEvents";
+import Swal from "sweetalert2";
 
 export const useCalendarStore = () => {
   const dispatch = useDispatch();
@@ -22,13 +23,18 @@ export const useCalendarStore = () => {
   };
 
   const startSavingEvent = async (calendarEvent) => {
-    // TODO: Access the backend
+    try {
+      if (calendarEvent.id) {
+        // Updating
+        await calendarApi.put(
+          `/events/${calendarEvent.id}`,
+          calendarEvent
+        );
 
-    // TODO: Update event
-    if (calendarEvent._id) {
-      // Uppdating
-      dispatch(onUpdateEvent({ ...calendarEvent }));
-    } else {
+        dispatch(onUpdateEvent({ ...calendarEvent, user }));
+
+        return;
+      }
       // Creating
       const { data } = await calendarApi.post(
         "/events",
@@ -42,6 +48,13 @@ export const useCalendarStore = () => {
           id: data.event.id,
           user,
         })
+      );
+    } catch (error) {
+      console.log(error);
+      Swal.fire(
+        "Error saving.",
+        error.response.data.msg,
+        "error"
       );
     }
   };
