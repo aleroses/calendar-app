@@ -5,6 +5,7 @@ import {
   onSetActiveEvent,
   onUpdateEvent,
 } from "../store/calendar/calendarSlice";
+import calendarApi from "../api/calendarApi";
 
 export const useCalendarStore = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ export const useCalendarStore = () => {
   const { events, activeEvent } = useSelector(
     (state) => state.calendar
   );
+  const { user } = useSelector((state) => state.auth);
 
   const setActiveEvent = (calendarEvent) => {
     dispatch(onSetActiveEvent(calendarEvent));
@@ -19,16 +21,24 @@ export const useCalendarStore = () => {
 
   const startSavingEvent = async (calendarEvent) => {
     // TODO: Access the backend
-    // TODO: OK
+
+    // TODO: Update event
     if (calendarEvent._id) {
       // Uppdating
       dispatch(onUpdateEvent({ ...calendarEvent }));
     } else {
       // Creating
+      const { data } = await calendarApi.post(
+        "/events",
+        calendarEvent
+      );
+      // console.log({data});
+
       dispatch(
         onAddNewEvent({
           ...calendarEvent,
-          _id: new Date().getTime(),
+          id: data.event.id,
+          user,
         })
       );
     }
