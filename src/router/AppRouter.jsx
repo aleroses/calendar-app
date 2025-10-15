@@ -18,7 +18,6 @@ export const AppRouter = () => {
     return <h3>Loading...</h3>;
   }
 
-  console.log(getEnvVariables());
   return (
     <Routes>
       {status === "not-authenticated" ? (
