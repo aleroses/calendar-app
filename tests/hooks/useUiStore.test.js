@@ -32,7 +32,7 @@ describe("Tests in the useUiStore", () => {
       isDateModalOpen: false,
       closeDateModal: expect.any(Function),
       openDateModal: expect.any(Function),
-      // toggleDateModal: expect.any(Function),
+      toggleDateModal: expect.any(Function),
     });
   });
 
@@ -54,6 +54,48 @@ describe("Tests in the useUiStore", () => {
     });
 
     // console.log({ result: result.current, isDateModalOpen });
+    expect(result.current.isDateModalOpen).toBeTruthy();
+  });
+
+  test("closeDateModal should set false in isDateModalOpen.", () => {
+    const mockStore = getMockStore({
+      isDateModalOpen: true,
+    });
+
+    const { result } = renderHook(() => useUiStore(), {
+      wrapper: ({ children }) => (
+        <Provider store={mockStore}>{children}</Provider>
+      ),
+    });
+
+    act(() => {
+      result.current.closeDateModal();
+    });
+
+    expect(result.current.isDateModalOpen).toBeFalsy();
+  });
+
+  test("toggleDateModal should change the state accordingly.", () => {
+    const mockStore = getMockStore({
+      isDateModalOpen: true,
+    });
+
+    const { result } = renderHook(() => useUiStore(), {
+      wrapper: ({ children }) => (
+        <Provider store={mockStore}>{children}</Provider>
+      ),
+    });
+
+    act(() => {
+      result.current.toggleDateModal();
+    });
+
+    expect(result.current.isDateModalOpen).toBeFalsy();
+
+    act(() => {
+      result.current.toggleDateModal();
+    });
+
     expect(result.current.isDateModalOpen).toBeTruthy();
   });
 });
