@@ -4,7 +4,11 @@ import {
   initialState,
   notAuthenticatedState,
 } from "../fixtures/authStates";
-import { act, renderHook } from "@testing-library/react";
+import {
+  act,
+  renderHook,
+  waitFor,
+} from "@testing-library/react";
 import { useAuthStore } from "../../src/hooks/useAuthStore";
 import { Provider } from "react-redux";
 import { testUserCredentials } from "../fixtures/testUser";
@@ -74,6 +78,40 @@ describe("Tests in useAuthStore", () => {
     );
     expect(localStorage.getItem("token-init-date")).toEqual(
       expect.any(String)
+    );
+  });
+
+  test("StartLogin should display login errors.", async () => {
+    localStorage.clear();
+    const mockStore = getMockStore({
+      ...notAuthenticatedState,
+    });
+    const { result } = renderHook(() => useAuthStore(), {
+      wrapper: ({ children }) => (
+        <Provider store={mockStore}>{children}</Provider>
+      ),
+    });
+
+    await act(async () => {
+      await result.current.startLogin({
+        email: "algo@google.com",
+        password: "123456",
+      });
+    });
+
+    const { errorMessage, status, user } = result.current;
+    // console.log(localStorage.getItem("token"));
+    // console.log({ errorMessage, status, user });
+
+    expect(localStorage.getItem("token")).toBe(null);
+    expect({ errorMessage, status, user }).toEqual({
+      errorMessage: "Incorrect credentials.",
+      status: "not-authenticated",
+      user: {},
+    });
+
+    await waitFor(() =>
+      expect(result.current.errorMessage).toBe(undefined)
     );
   });
 });
