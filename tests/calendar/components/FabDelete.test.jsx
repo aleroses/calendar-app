@@ -1,15 +1,23 @@
-import { Provider } from "react-redux";
 import { render, screen } from "@testing-library/react";
 import { FabDelete } from "../../../src/calendar/components/FabDelete";
-import { store } from "../../../src/store/store";
+import { useCalendarStore } from "../../../src/hooks/useCalendarStore";
+
+jest.mock("../../../src/hooks/useCalendarStore");
 
 describe("Tests in the FabDelete", () => {
   test("Should display the component correctly.", () => {
-    render(
-      <Provider store={store}>
-        <FabDelete />
-      </Provider>
-    );
-    screen.debug();
+    // tip: jest.fn().mockReturnValue
+    useCalendarStore.mockReturnValue({
+      hasEventSelected: false,
+    });
+    render(<FabDelete />);
+    // screen.debug();
+
+    const btn = screen.getByLabelText("btn-delete");
+
+    expect(btn.classList).toContain("btn");
+    expect(btn.classList).toContain("btn-danger");
+    expect(btn.classList).toContain("fab-danger");
+    expect(btn.style.display).toBe("none");
   });
 });
