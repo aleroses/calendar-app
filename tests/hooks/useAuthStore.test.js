@@ -159,4 +159,27 @@ describe("Tests in useAuthStore", () => {
 
     spy.mockRestore();
   });
+
+  test("startRegister must fail to create.", async () => {
+    const mockStore = getMockStore({
+      ...notAuthenticatedState,
+    });
+    const { result } = renderHook(() => useAuthStore(), {
+      wrapper: ({ children }) => (
+        <Provider store={mockStore}>{children}</Provider>
+      ),
+    });
+
+    await act(async () => {
+      await result.current.startRegister(testUserCredentials);
+    });
+
+    const { errorMessage, status, user } = result.current;
+    // console.log({ errorMessage, status, user });
+    expect({ errorMessage, status, user }).toEqual({
+      errorMessage: "This email address is already in use.",
+      status: "not-authenticated",
+      user: {},
+    });
+  });
 });
